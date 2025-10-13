@@ -1,6 +1,7 @@
 SHELL = /bin/bash
 
-.PHONY: help up in down build bash freeze pytest cov env-file venv pre-commit setup
+.PHONY: help up in down build bash freeze pytest cov env-file venv pre-commit setup \
+        alembic-upgrade alembic-downgrade
 
 .DEFAULT_GOAL := help
 
@@ -40,6 +41,25 @@ cov:  ## Run tests and make coverage report
 	"pytest --cov --cov-report html:coverage/html" \
 	&& open coverage/html/index.html
 
+# Alembic
+alembic-upgrade:  ## Run alembic upgrades (development + production)
+	export ENVIRONMENT=development && \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	"alembic upgrade head"
+
+	export ENVIRONMENT=production && \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	"alembic upgrade head"
+
+alembic-downgrade:  ## Run alembic downgrade -1 (development + production)
+	export ENVIRONMENT=development && \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	"alembic downgrade -1"
+
+	export ENVIRONMENT=production && \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	"alembic downgrade -1"
+
 env-file: ## Create an .env file based on .env.example
 	@cp .env.example .env
 	@echo "✅ Copied .env.example → .env"
@@ -67,4 +87,5 @@ setup: ## Setup environment, build images and containers, start cli
 	@$(MAKE) build
 	@$(MAKE) up
 	@echo "⚡ Containers started, opening bash shell..."
+	@$(MAKE) alembic-upgrade
 	docker compose -f docker-compose.yaml exec -it cli bash -c "echo '✅ Setup finished! Command to access the CLI: cli'; bash"
