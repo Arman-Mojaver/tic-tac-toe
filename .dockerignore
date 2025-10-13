@@ -54,3 +54,5 @@ venv.bak/
 *.swp
 *.bak
 *.tmp
+htmlcov
+compose
