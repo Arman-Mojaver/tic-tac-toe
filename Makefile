@@ -1,8 +1,10 @@
 SHELL = /bin/bash
 
-.PHONY: help up in down build bash freeze pytest
+.PHONY: help up in down build bash freeze pytest env-file venv pre-commit setup
 
 .DEFAULT_GOAL := help
+
+VENV_DIR := .venv
 
 
 help: ## Show this help message
@@ -32,3 +34,32 @@ freeze:  ## Run pip freeze (requirements.txt)
 
 pytest:  ## Run pytest
 	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/code cli /bin/bash -c "python -m pytest"
+
+env-file: ## Create an .env file based on .env.example
+	@cp .env.example .env
+	@echo "✅ Copied .env.example → .env"
+
+venv: ## Create a Python virtual environment if not exists and install dependencies
+	@echo "🐍 Creating Python virtual environment..."
+	@if [ ! -d "$(VENV_DIR)" ]; then \
+		python3 -m venv $(VENV_DIR); \
+	fi
+	@echo "📦 Installing dependencies from requirements.txt..."
+	@. $(VENV_DIR)/bin/activate && pip install --upgrade pip setuptools wheel && pip install -r requirements.txt && pip install -e .
+	@echo "✅ Virtual environment ready at $(VENV_DIR)"
+
+pre-commit: ## Install and set up pre-commit hooks
+	@echo "🧹 Installing pre-commit hooks..."
+	@. $(VENV_DIR)/bin/activate && pip install pre-commit && pre-commit install
+	@echo "✅ Pre-commit hooks installed"
+
+setup: ## Setup environment, build images and containers, start cli
+	@echo "🔧 Setting up environment..."
+	@$(MAKE) env-file
+	@$(MAKE) venv
+	@$(MAKE) pre-commit
+	@echo "🚀 Building Docker images and starting containers..."
+	@$(MAKE) build
+	@$(MAKE) up
+	@echo "⚡ Containers started, opening bash shell..."
+	docker compose -f docker-compose.yaml exec -it cli bash -c "echo '✅ Setup finished! Command to access the CLI: cli'; bash"
