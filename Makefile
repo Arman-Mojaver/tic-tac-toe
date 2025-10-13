@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-.PHONY: help up in down build bash freeze pytest env-file venv pre-commit setup
+.PHONY: help up in down build bash freeze pytest cov env-file venv pre-commit setup
 
 .DEFAULT_GOAL := help
 
@@ -34,6 +34,11 @@ freeze:  ## Run pip freeze (requirements.txt)
 
 pytest:  ## Run pytest
 	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/code cli /bin/bash -c "python -m pytest"
+
+cov:  ## Run tests and make coverage report
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	"pytest --cov --cov-report html:coverage/html" \
+	&& open coverage/html/index.html
 
 env-file: ## Create an .env file based on .env.example
 	@cp .env.example .env
