@@ -1,4 +1,9 @@
+import sys
+from pathlib import Path
+
 import click
+
+sys.path.append(Path(__file__).resolve().parent.parent.as_posix())
 
 from .utils.main import utils_subcommands
 

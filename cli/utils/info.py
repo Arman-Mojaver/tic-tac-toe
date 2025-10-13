@@ -3,6 +3,8 @@ import sys
 
 import click
 
+from logger import log
+
 
 def count_lines_of_code(path: pathlib.Path) -> int:
     exclude_dirs = {
@@ -27,7 +29,6 @@ def count_lines_of_code(path: pathlib.Path) -> int:
             err = f"Skipping {py_file}: {e}"
             click.echo(err)
 
-
     return total_lines
 
 
@@ -38,7 +39,7 @@ def get_project_size(path: pathlib.Path) -> str:
         if f.is_file():
             total_bytes += f.stat().st_size
 
-    size_gb = total_bytes / (1024 ** 3)
+    size_gb = total_bytes / (1024**3)
     return f"{size_gb:.3f} GB"
 
 
@@ -58,3 +59,5 @@ def get_info() -> None:
     click.echo(f"Python version: {python_version}")
     click.echo(f"Total lines of Python code: {total_lines}")
     click.echo(f"Size on disk: {size}")
+
+    log.info("Successfully retrieved project info!")
