@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-.PHONY: help up in down build bash
+.PHONY: help up in down build bash freeze
 
 .DEFAULT_GOAL := help
 
@@ -26,3 +26,6 @@ build:  ## Build image
 
 bash:  ## Open a bash shell in cli service
 	docker compose -f docker-compose.yaml run --rm -it cli bash
+
+freeze:  ## Run pip freeze (requirements.txt)
+	pip freeze | grep -v "custom_cli" > requirements.txt
