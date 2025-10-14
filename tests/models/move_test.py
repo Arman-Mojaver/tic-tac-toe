@@ -14,7 +14,7 @@ def clear_moves(session):
 
 @pytest.fixture
 def move(create_move, create_match):
-    match = create_match(x_name="AliceX", o_name="BobO")
+    match = create_match()
     return create_move(match=match, user=match.user_x, x=2, y=3, order=1)
 
 

@@ -12,7 +12,7 @@ def clear_matches(session):
 
 
 def test_create_match(session, create_match):
-    match = create_match(x_name="AliceX", o_name="BobO")
+    match = create_match()
 
     db_match = session.query(Match).filter_by(id=match.id).first()
     assert db_match is not None
@@ -23,7 +23,7 @@ def test_create_match(session, create_match):
 
 
 def test_update_match_winner(session, create_match):
-    match = create_match(x_name="CharlieX", o_name="DanaO")
+    match = create_match()
 
     match.winner_id = match.user_x_id
     session.commit()
@@ -33,7 +33,7 @@ def test_update_match_winner(session, create_match):
 
 
 def test_delete_match(session, create_match):
-    match = create_match(x_name="EddieX", o_name="FionaO")
+    match = create_match()
 
     session.delete(match)
     session.commit()
@@ -43,7 +43,7 @@ def test_delete_match(session, create_match):
 
 
 def test_serialize_rules(create_match):
-    match = create_match(x_name="GabeX", o_name="HanaO")
+    match = create_match()
 
     serialized = match.to_dict()
     assert serialized["id"] == match.id

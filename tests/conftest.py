@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import os
 
 import pytest
@@ -68,10 +70,21 @@ def create_user(session):
 
 @pytest.fixture
 def create_match(session, create_user):
-    def _create_match(x_name="PlayerX", o_name="PlayerO", winner=None):
-        user_x = create_user(name=x_name, password="secret")
-        user_o = create_user(name=o_name, password="secret")
-        match = Match(user_x_id=user_x.id, user_o_id=user_o.id, winner_id=winner)
+    user_1 = create_user(name="PlayerX", password="secret")
+    user_2 = create_user(name="PlayerO", password="secret")
+
+    def _create_match(
+        user_x: User | None = None,
+        user_o: User | None = None,
+        winner: User | None = None,
+    ):
+        if not user_x:
+            user_x = user_1
+
+        if not user_o:
+            user_o = user_2
+
+        match = Match(user_x_id=user_x.id, user_o_id=user_o.id, winner=winner)
         session.add(match)
         session.commit()
         session.refresh(match)
