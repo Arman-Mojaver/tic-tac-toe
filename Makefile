@@ -18,8 +18,8 @@ help: ## Show this help message
 up:  ## Start containers
 	docker compose -f docker-compose.yaml up -d
 
-in:  ## Open a bash shell in started cli service
-	docker compose -f docker-compose.yaml exec -it cli bash
+in:  ## Open a bash shell in started webapp service
+	docker compose -f docker-compose.yaml exec -it webapp bash
 
 down:  ## Remove containers
 	docker compose -f docker-compose.yaml down
@@ -27,37 +27,37 @@ down:  ## Remove containers
 build:  ## Build image
 	docker compose -f docker-compose.yaml build
 
-bash:  ## Open a bash shell in cli service
-	docker compose -f docker-compose.yaml run --rm -it cli bash
+bash:  ## Open a bash shell in webapp service
+	docker compose -f docker-compose.yaml run --rm -it webapp bash
 
 freeze:  ## Run pip freeze (requirements.txt)
 	pip freeze | grep -v "custom_cli" > requirements.txt
 
 pytest:  ## Run pytest
-	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/code cli /bin/bash -c "python -m pytest"
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/code webapp /bin/bash -c "python -m pytest"
 
 cov:  ## Run tests and make coverage report
-	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app webapp /bin/bash -c \
 	"pytest --cov --cov-report html:coverage/html" \
 	&& open coverage/html/index.html
 
 # Alembic
 alembic-upgrade:  ## Run alembic upgrades (development + production)
 	export ENVIRONMENT=development && \
-	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app webapp /bin/bash -c \
 	"alembic upgrade head"
 
 	export ENVIRONMENT=production && \
-	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app webapp /bin/bash -c \
 	"alembic upgrade head"
 
 alembic-downgrade:  ## Run alembic downgrade -1 (development + production)
 	export ENVIRONMENT=development && \
-	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app webapp /bin/bash -c \
 	"alembic downgrade -1"
 
 	export ENVIRONMENT=production && \
-	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app cli /bin/bash -c \
+	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app webapp /bin/bash -c \
 	"alembic downgrade -1"
 
 env-file: ## Create an .env file based on .env.example
@@ -78,7 +78,7 @@ pre-commit: ## Install and set up pre-commit hooks
 	@. $(VENV_DIR)/bin/activate && pip install pre-commit && pre-commit install
 	@echo "✅ Pre-commit hooks installed"
 
-setup: ## Setup environment, build images and containers, start cli
+setup: ## Setup environment, build images and containers, start webapp
 	@echo "🔧 Setting up environment..."
 	@$(MAKE) env-file
 	@$(MAKE) venv
@@ -88,4 +88,4 @@ setup: ## Setup environment, build images and containers, start cli
 	@$(MAKE) up
 	@echo "⚡ Containers started, opening bash shell..."
 	@$(MAKE) alembic-upgrade
-	docker compose -f docker-compose.yaml exec -it cli bash -c "echo '✅ Setup finished! Command to access the CLI: cli'; bash"
+	docker compose -f docker-compose.yaml exec -it webapp bash -c "echo '✅ Setup finished! Command to access the CLI: cli'; bash"

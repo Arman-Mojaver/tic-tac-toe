@@ -1,12 +1,14 @@
 services:
-  cli:
-    container_name: cli
+  webapp:
+    container_name: webapp
     build: .
     tty: true
     volumes:
       - ./:/code
     environment:
       - ENVIRONMENT=${ENVIRONMENT}
+    ports:
+      - "8000:8000"
 
   db-development:
     container_name: db-development
