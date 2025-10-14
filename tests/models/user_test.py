@@ -3,21 +3,11 @@ import pytest
 from database.models import User
 
 
-@pytest.fixture
-def create_user(session):
-    def _create_user(name="TestUser", password="secret"):  # noqa: S107
-        user = User(name=name, password=password)
-        session.add(user)
-        session.commit()
-        return user
-    return _create_user
-
-
 @pytest.fixture(autouse=True)
 def clear_users(session):
+    yield
     session.query(User).delete()
     session.commit()
-
 
 
 def test_create_user(session, create_user):
@@ -26,7 +16,6 @@ def test_create_user(session, create_user):
     db_user = session.query(User).filter_by(name="Alice").first()
     assert user.id == db_user.id
     assert user.name == db_user.name
-
 
 
 def test_update_user(session, create_user):
