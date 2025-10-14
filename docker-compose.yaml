@@ -9,6 +9,11 @@ services:
       - ENVIRONMENT=${ENVIRONMENT}
     ports:
       - "8000:8000"
+    depends_on:
+      db-development:
+        condition: service_healthy
+      db-production:
+        condition: service_healthy
 
   db-development:
     container_name: db-development
