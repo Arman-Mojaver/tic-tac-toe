@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 
 from database import session
 from database.models import Match, User
+from src.game_engine import GameEngine
 from src.schemas import MatchUsers
 
 app = FastAPI(title="tictactoe")
@@ -41,3 +42,21 @@ def create_match(match_users: MatchUsers) -> JSONResponse:
     session.refresh(match)
 
     return JSONResponse(content={"match_id": match.id})
+
+
+@app.get("/status")
+def get_status(match_id: int) -> JSONResponse:
+    match = session.query(Match).filter_by(id=match_id).one_or_none()
+    if not match:
+        return JSONResponse(
+            content={"error": f"Match ID not found: {match_id}"},
+            status_code=404,
+        )
+
+    game_engine = GameEngine(match=match, moves=match.moves)
+    status = game_engine.status()
+
+    return JSONResponse(
+            content={"data": status.model_dump()},
+            status_code=200,
+        )
