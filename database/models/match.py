@@ -9,6 +9,7 @@ from database import Base, CRUDMixin
 
 if TYPE_CHECKING:
     from database.models import User
+    from database.models.move import Move
 
 
 class Match(Base, CRUDMixin):
@@ -42,5 +43,12 @@ class Match(Base, CRUDMixin):
     winner: Mapped[User | None] = relationship(
         "User",
         foreign_keys=[winner_id],
+        passive_deletes=True,
+    )
+
+    moves: Mapped[list[Move]] = relationship(
+        "Move",
+        foreign_keys="Move.match_id",
+        back_populates="match",
         passive_deletes=True,
     )
