@@ -1,5 +1,4 @@
 import os
-from collections.abc import Generator
 
 import pytest
 from alembic import command
@@ -9,8 +8,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 from sqlalchemy_utils import create_database, database_exists, drop_database
 
-from src.main import app
-
 os.environ["ENVIRONMENT"] = "testing"
 
 from config import config as project_config
@@ -18,11 +15,7 @@ from config import config as project_config
 if not project_config.is_testing():
     err = f"Invalid testing environment: {project_config}"
 
-
-@pytest.fixture
-def client():
-    with TestClient(app) as client:
-        yield client
+from src.main import app
 
 
 @pytest.fixture(scope="session")
@@ -31,19 +24,19 @@ def debug(request) -> bool:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def _setup_test_database(*, debug: bool) -> Generator[None]:
-    """Create the test database, runs migrations, and tear it down afterward."""
-    if database_exists(project_config.SQLALCHEMY_DATABASE_URI):
-        drop_database(project_config.SQLALCHEMY_DATABASE_URI)
-    create_database(project_config.SQLALCHEMY_DATABASE_URI)
+def client(*, debug: bool):
+    with TestClient(app) as client:
+        if database_exists(project_config.SQLALCHEMY_DATABASE_URI):
+            drop_database(project_config.SQLALCHEMY_DATABASE_URI)
+        create_database(project_config.SQLALCHEMY_DATABASE_URI)
 
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
+        alembic_cfg = Config("alembic.ini")
+        command.upgrade(alembic_cfg, "head")
 
-    yield
+        yield client
 
-    if not debug:
-        drop_database(project_config.SQLALCHEMY_DATABASE_URI)
+        if not debug:
+            drop_database(project_config.SQLALCHEMY_DATABASE_URI)
 
 
 @pytest.fixture
