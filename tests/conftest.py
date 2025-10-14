@@ -15,6 +15,7 @@ from config import config as project_config
 if not project_config.is_testing():
     err = f"Invalid testing environment: {project_config}"
 
+from database.models import User
 from src.main import app
 
 
@@ -24,7 +25,7 @@ def debug(request) -> bool:
 
 
 @pytest.fixture(scope="session", autouse=True)
-def client(*, debug: bool):
+def client():
     with TestClient(app) as client:
         if database_exists(project_config.SQLALCHEMY_DATABASE_URI):
             drop_database(project_config.SQLALCHEMY_DATABASE_URI)
@@ -34,9 +35,6 @@ def client(*, debug: bool):
         command.upgrade(alembic_cfg, "head")
 
         yield client
-
-        if not debug:
-            drop_database(project_config.SQLALCHEMY_DATABASE_URI)
 
 
 @pytest.fixture
@@ -50,3 +48,19 @@ def session() -> Session:
 
     session.close()
     engine.dispose()
+
+
+@pytest.fixture
+def fake_id():
+    return 12345678
+
+
+@pytest.fixture
+def create_user(session):
+    def _create_user(name="TestUser", password="secret"):  # noqa: S107
+        user = User(name=name, password=password)
+        session.add(user)
+        session.commit()
+        return user
+
+    return _create_user

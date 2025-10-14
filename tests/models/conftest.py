@@ -4,17 +4,6 @@ from database.models import Match, Move, User
 
 
 @pytest.fixture
-def create_user(session):
-    def _create_user(name="TestUser", password="secret"):  # noqa: S107
-        user = User(name=name, password=password)
-        session.add(user)
-        session.commit()
-        return user
-
-    return _create_user
-
-
-@pytest.fixture
 def create_match(session, create_user):
     def _create_match(x_name="PlayerX", o_name="PlayerO", winner=None):
         user_x = create_user(name=x_name, password="secret")
