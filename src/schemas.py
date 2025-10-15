@@ -33,7 +33,7 @@ class MoveResponse(BaseModel):
     winner_id: int | None = None
 
 
-class GameStatus(BaseModel):
+class StatusResponse(BaseModel):
     match_id: int
     user_x_id: int
     user_o_id: int

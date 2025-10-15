@@ -3,7 +3,7 @@ from __future__ import annotations
 from database import session
 from database.models import Match, Move
 from database.models.move import MoveList
-from src.schemas import GameStatus
+from src.schemas import StatusResponse
 
 
 class GameEngine:
@@ -28,8 +28,8 @@ class GameEngine:
         self.user_o_id: int = match.user_o_id
         self.moves: list[Move] = moves
 
-    def status(self) -> GameStatus:
-        return GameStatus(
+    def status(self) -> StatusResponse:
+        return StatusResponse(
             match_id=self.match.id,
             user_x_id=self.user_x_id,
             user_o_id=self.user_o_id,
