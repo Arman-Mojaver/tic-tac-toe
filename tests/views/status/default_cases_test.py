@@ -13,7 +13,7 @@ def test_initialized_game_returns_no_coordinates_and_user_x_turn(client, create_
             "match_id": match.id,
             "user_x_id": match.user_x_id,
             "user_o_id": match.user_o_id,
-            "user_turn": match.user_x_id,
+            "user_turn_id": match.user_x_id,
             "user_x_coordinates": [],
             "user_o_coordinates": [],
             "winner_id": None,

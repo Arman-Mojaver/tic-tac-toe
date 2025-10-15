@@ -45,7 +45,7 @@ def create_move_view(create_move_data: CreateMoveData) -> MoveResponse:
 
     game_engine = GameEngine(match=match, moves=match.moves)
 
-    if game_engine.user_turn() != create_move_data.user_id:
+    if game_engine.user_turn_id() != create_move_data.user_id:
         err = f"Invalid turn. It is not the turn of user_id: {create_move_data.user_id}"
         raise InvalidTurnError(err)
 

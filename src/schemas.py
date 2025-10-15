@@ -39,7 +39,7 @@ class StatusResponse(BaseModel):
     match_id: PositiveInt
     user_x_id: PositiveInt
     user_o_id: PositiveInt
-    user_turn: PositiveInt | None = None
+    user_turn_id: PositiveInt | None = None
     user_x_coordinates: list[list[Literal[0, 1, 2]]] = Field(default_factory=list)
     user_o_coordinates: list[list[Literal[0, 1, 2]]] = Field(default_factory=list)
     winner_id: PositiveInt | None = None

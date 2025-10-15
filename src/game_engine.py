@@ -34,7 +34,7 @@ class GameEngine:
             match_id=self.match.id,
             user_x_id=self.user_x_id,
             user_o_id=self.user_o_id,
-            user_turn=self.user_turn(),
+            user_turn_id=self.user_turn_id(),
             user_x_coordinates=self._user_coordinates(user_id=self.user_x_id),
             user_o_coordinates=self._user_coordinates(user_id=self.user_o_id),
             winner_id=self.match.winner_id,
@@ -47,7 +47,7 @@ class GameEngine:
             if move.user_id == user_id
         ]
 
-    def user_turn(self) -> int | None:
+    def user_turn_id(self) -> int | None:
         if len(self.moves) == self.MAX_MOVE_COUNT or self.match.winner_id:
             return None
 
