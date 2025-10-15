@@ -6,8 +6,10 @@ from fastapi.responses import JSONResponse
 from database import session
 from database.models import Match, User
 from database.models.move import MoveList
+from src.errors import SameUserError, UserNotFoundError
 from src.game_engine import GameEngine
 from src.schemas import MatchUsers, MoveData
+from src.views.create_match_view import create_match_view
 
 app = FastAPI(title="tictactoe")
 
@@ -19,30 +21,18 @@ def health_check() -> JSONResponse:
 
 @app.post("/create")
 def create_match(match_users: MatchUsers) -> JSONResponse:
-    user_x = session.query(User).filter_by(id=match_users.user_x_id).one_or_none()
-    if not user_x:
+    try:
+        match = create_match_view(match_users=match_users)
+    except UserNotFoundError as e:
         return JSONResponse(
-            content={"error": f"User not found. ID {match_users.user_x_id}"},
+            content={"error": str(e)},
             status_code=HTTPStatus.NOT_FOUND,
         )
-
-    user_o = session.query(User).filter_by(id=match_users.user_o_id).one_or_none()
-    if not user_o:
+    except SameUserError as e:
         return JSONResponse(
-            content={"error": f"User not found. ID {match_users.user_o_id}"},
-            status_code=HTTPStatus.NOT_FOUND,
-        )
-
-    if user_x.id == user_o.id:
-        return JSONResponse(
-            content={"error": f"User ids can not be the same. ID: {user_x.id}"},
+            content={"error": str(e)},
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
-
-    match = Match(user_x_id=user_x.id, user_o_id=user_o.id)
-    session.add(match)
-    session.commit()
-    session.refresh(match)
 
     return JSONResponse(content={"match_id": match.id})
 
