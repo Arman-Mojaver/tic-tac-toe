@@ -15,6 +15,9 @@ help: ## Show this help message
 	/^# / {printf "\n%s\n", substr($$0, 3); next} \
 	{printf "  %-20s %s\n", $$1, $$2}'
 
+
+
+# Docker
 up:  ## Start containers
 	docker compose -f docker-compose.yaml up -d
 
@@ -27,12 +30,9 @@ down:  ## Remove containers
 build:  ## Build image
 	docker compose -f docker-compose.yaml build
 
-bash:  ## Open a bash shell in webapp service
-	docker compose -f docker-compose.yaml run --rm -it webapp bash
 
-freeze:  ## Run pip freeze (requirements.txt)
-	pip freeze | grep -v "custom_cli" > requirements.txt
 
+# Tests
 pytest:  ## Run pytest
 	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/code webapp /bin/bash -c "python -m pytest"
 
@@ -40,6 +40,8 @@ cov:  ## Run tests and make coverage report
 	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app webapp /bin/bash -c \
 	"pytest --cov --cov-report html:coverage/html" \
 	&& open coverage/html/index.html
+
+
 
 # Alembic
 alembic-upgrade:  ## Run alembic upgrades (development + production)
@@ -60,6 +62,21 @@ alembic-downgrade:  ## Run alembic downgrade -1 (development + production)
 	docker compose -f docker-compose.yaml run --rm -it -v $(PWD):/app webapp /bin/bash -c \
 	"alembic downgrade -1"
 
+
+
+# Utils
+bash:  ## Open a bash shell in webapp service
+	docker compose -f docker-compose.yaml run --rm -it webapp bash
+
+freeze:  ## Run pip freeze (requirements.txt)
+	pip freeze | grep -v "custom_cli" > requirements.txt
+
+seed: ## Seed database with users
+	docker compose -f docker-compose.yaml run --rm -it webapp /bin/bash -c "cli seed"
+
+
+
+# Env
 env-file: ## Create an .env file based on .env.example
 	@cp .env.example .env
 	@echo "✅ Copied .env.example → .env"
@@ -93,6 +110,3 @@ setup: ## Setup environment, build images and containers, start webapp
 
 docs: ## Open Swagger UI
 	@python -c "import webbrowser; webbrowser.open('http://localhost:8000/docs')"
-
-seed: ## Seed database with users
-	docker compose -f docker-compose.yaml run --rm -it webapp /bin/bash -c "cli seed"
