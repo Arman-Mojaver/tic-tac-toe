@@ -4,12 +4,18 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
 from database import session
-from database.models import Match, User
-from database.models.move import MoveList
-from src.errors import MatchNotFoundError, SameUserError, UserNotFoundError
-from src.game_engine import GameEngine
+from src.errors import (
+    GameFinishedError,
+    InvalidTurnError,
+    MatchNotFoundError,
+    MismatchError,
+    OccupiedSquareError,
+    SameUserError,
+    UserNotFoundError,
+)
 from src.schemas import MatchUsers, MoveData
 from src.views.create_match_view import create_match_view
+from src.views.create_move_view import create_move_view
 from src.views.get_status_view import get_status_view
 
 app = FastAPI(title="tictactoe")
@@ -55,70 +61,19 @@ def get_status(match_id: int) -> JSONResponse:
 
 
 @app.post("/move")
-def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
-    user = session.query(User).filter_by(id=move_data.user_id).one_or_none()
-    if not user:
+def create_move(move_data: MoveData) -> JSONResponse:
+    try:
+        move = create_move_view(move_data=move_data)
+    except (UserNotFoundError, MatchNotFoundError, MismatchError) as e:
         return JSONResponse(
-            content={"error": f"User not found. ID: {move_data.user_id}"},
+            content={"error": str(e)},
             status_code=HTTPStatus.NOT_FOUND,
         )
-
-    match = session.query(Match).filter_by(id=move_data.match_id).one_or_none()
-    if not match:
+    except (GameFinishedError, OccupiedSquareError, InvalidTurnError) as e:
         return JSONResponse(
-            content={"error": f"Match not found. ID: {move_data.match_id}"},
-            status_code=HTTPStatus.NOT_FOUND,
-        )
-
-    if move_data.user_id not in match.user_ids():
-        return JSONResponse(
-            content={
-                "error": f"User does not belong to match. User ID: {user.id}, Match ID: {match.id}"  # noqa: E501
-            },
-            status_code=HTTPStatus.NOT_FOUND,
-        )
-
-    if match.winner_id:
-        return JSONResponse(
-            content={
-                "error": f"The game has already finished. The winner is: {match.winner_id}"  # noqa: E501
-            },
+            content={"error": str(e)},
             status_code=HTTPStatus.CONFLICT,
         )
-
-    if len(match.moves) == GameEngine.MAX_MOVE_COUNT and not match.winner_id:
-        return JSONResponse(
-            content={
-                "error": "The game has already finished without a winner. You can not make a move"  # noqa: E501
-            },
-            status_code=HTTPStatus.CONFLICT,
-        )
-
-    if move_data.coordinates() in MoveList(match.moves).coordinates():
-        return JSONResponse(
-            content={
-                "error": f"Square already occupied. coordinate_x: {move_data.coordinate_x}, coordinate_y: {move_data.coordinate_y}"  # noqa: E501
-            },
-            status_code=HTTPStatus.CONFLICT,
-        )
-
-
-
-    game_engine = GameEngine(match=match, moves=match.moves)
-
-    if game_engine.user_turn() != move_data.user_id:
-        return JSONResponse(
-            content={
-                "error": f"Invalid turn. It is not the turn of user_id: {move_data.user_id}"  # noqa: E501
-            },
-            status_code=HTTPStatus.CONFLICT,
-        )
-
-    move = game_engine.create_move(
-        user_id=move_data.user_id,
-        coordinate_x=move_data.coordinate_x,
-        coordinate_y=move_data.coordinate_y,
-    )
 
     session.commit()
 
@@ -126,11 +81,11 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
         content={
             "data": {
                 "id": move.id,
-                "match_id": match.id,
+                "match_id": move.match.id,
                 "user_id": move_data.user_id,
                 "coordinate_x": move_data.coordinate_x,
                 "coordinate_y": move_data.coordinate_y,
-                "winner_id": match.winner_id,
+                "winner_id": move.match.winner_id,
             }
         },
         status_code=HTTPStatus.OK,
