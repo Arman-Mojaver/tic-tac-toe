@@ -20,6 +20,15 @@ class CreateMoveData(BaseModel):
         return self.coordinate_x, self.coordinate_y
 
 
+class MoveResponse(BaseModel):
+    id: int
+    match_id: int
+    user_id: int
+    coordinate_x: int
+    coordinate_y: int
+    winner_id: int | None = None
+
+
 class GameStatus(BaseModel):
     match_id: int
     user_x_id: int

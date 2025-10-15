@@ -3,7 +3,6 @@ from http import HTTPStatus
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
-from database import session
 from src.errors import (
     GameFinishedError,
     InvalidTurnError,
@@ -63,7 +62,7 @@ def get_status(match_id: int) -> JSONResponse:
 @app.post("/move")
 def create_move(create_move_data: CreateMoveData) -> JSONResponse:
     try:
-        move = create_move_view(create_move_data=create_move_data)
+        move_response = create_move_view(create_move_data=create_move_data)
     except (UserNotFoundError, MatchNotFoundError, MismatchError) as e:
         return JSONResponse(
             content={"error": str(e)},
@@ -75,18 +74,7 @@ def create_move(create_move_data: CreateMoveData) -> JSONResponse:
             status_code=HTTPStatus.CONFLICT,
         )
 
-    session.commit()
-
     return JSONResponse(
-        content={
-            "data": {
-                "id": move.id,
-                "match_id": move.match.id,
-                "user_id": create_move_data.user_id,
-                "coordinate_x": create_move_data.coordinate_x,
-                "coordinate_y": create_move_data.coordinate_y,
-                "winner_id": move.match.winner_id,
-            }
-        },
+        content={"data": move_response.model_dump()},
         status_code=HTTPStatus.OK,
     )

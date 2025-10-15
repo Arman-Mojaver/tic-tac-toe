@@ -1,5 +1,5 @@
 from database import session
-from database.models import Match, Move, User
+from database.models import Match, User
 from database.models.move import MoveList
 from src.errors import (
     GameFinishedError,
@@ -10,10 +10,10 @@ from src.errors import (
     UserNotFoundError,
 )
 from src.game_engine import GameEngine
-from src.schemas import CreateMoveData
+from src.schemas import CreateMoveData, MoveResponse
 
 
-def create_move_view(create_move_data: CreateMoveData) -> Move:
+def create_move_view(create_move_data: CreateMoveData) -> MoveResponse:
     user = session.query(User).filter_by(id=create_move_data.user_id).one_or_none()
     if not user:
         err = f"User not found. ID: {create_move_data.user_id}"
@@ -49,8 +49,19 @@ def create_move_view(create_move_data: CreateMoveData) -> Move:
         err = f"Invalid turn. It is not the turn of user_id: {create_move_data.user_id}"
         raise InvalidTurnError(err)
 
-    return game_engine.create_move(
+    move = game_engine.create_move(
         user_id=create_move_data.user_id,
         coordinate_x=create_move_data.coordinate_x,
         coordinate_y=create_move_data.coordinate_y,
+    )
+
+    session.commit()
+
+    return MoveResponse(
+        id=move.id,
+        match_id=match.id,
+        user_id=create_move_data.user_id,
+        coordinate_x=create_move_data.coordinate_x,
+        coordinate_y=create_move_data.coordinate_y,
+        winner_id=match.winner_id,
     )
