@@ -87,8 +87,12 @@ setup: ## Setup environment, build images and containers, start webapp
 	@$(MAKE) build
 	@$(MAKE) up
 	@$(MAKE) alembic-upgrade
+	@$(MAKE) seed
 	@echo "⚡ Containers started, opening docs..."
 	@$(MAKE) docs
 
 docs: ## Open Swagger UI
 	@python -c "import webbrowser; webbrowser.open('http://localhost:8000/docs')"
+
+seed: ## Seed database with users
+	docker compose -f docker-compose.yaml run --rm -it webapp /bin/bash -c "cli seed"
