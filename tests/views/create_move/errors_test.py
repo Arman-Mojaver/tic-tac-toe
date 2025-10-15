@@ -155,7 +155,9 @@ def test_finished_game_without_winner_with_move_raises_error(
         },
     )
     assert response.status_code == 409
-    assert response.json() == {"error": "The game has already finished without a winner. You can not make a move"}  # noqa: E501
+    assert response.json() == {
+        "error": "The game has already finished without a winner. You can not make a move"
+    }
 
 
 def test_occupied_coordinates_raises_error(

@@ -19,7 +19,6 @@ def create_match_view(create_match_data: CreateMatchData) -> MatchResponse:
         err = f"User ids can not be the same. ID: {user_x.id}"
         raise SameUserError(err)
 
-
     match = Match(user_x_id=user_x.id, user_o_id=user_o.id)
     session.add(match)
     session.commit()

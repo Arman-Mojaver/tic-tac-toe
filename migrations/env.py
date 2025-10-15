@@ -37,7 +37,7 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    print(f"ENVIRONMENT={os.getenv("ENVIRONMENT")}")  # noqa: T201
+    print(f"ENVIRONMENT={os.getenv('ENVIRONMENT')}")  # noqa: T201
     print(f"SQLALCHEMY_DATABASE_URI={project_config.SQLALCHEMY_DATABASE_URI}")  # noqa: T201
 
     context.configure(
@@ -59,7 +59,7 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    print(f"ENVIRONMENT={os.getenv("ENVIRONMENT")}")  # noqa: T201
+    print(f"ENVIRONMENT={os.getenv('ENVIRONMENT')}")  # noqa: T201
     print(f"SQLALCHEMY_DATABASE_URI={project_config.SQLALCHEMY_DATABASE_URI}")  # noqa: T201
 
     alembic_config = config.get_section(config.config_ini_section)
