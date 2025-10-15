@@ -86,6 +86,9 @@ setup: ## Setup environment, build images and containers, start webapp
 	@echo "🚀 Building Docker images and starting containers..."
 	@$(MAKE) build
 	@$(MAKE) up
-	@echo "⚡ Containers started, opening bash shell..."
 	@$(MAKE) alembic-upgrade
-	docker compose -f docker-compose.yaml exec -it webapp bash -c "echo '✅ Setup finished! Command to access the CLI: cli'; bash"
+	@echo "⚡ Containers started, opening docs..."
+	@$(MAKE) docs
+
+docs: ## Open Swagger UI
+	@python -c "import webbrowser; webbrowser.open('http://localhost:8000/docs')"
