@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 
 from database import session
 from database.models import Move
+from database.models.move import MoveList
 from src.schemas import GameStatus
 
 if TYPE_CHECKING:
@@ -12,6 +13,19 @@ if TYPE_CHECKING:
 
 class GameEngine:
     MAX_MOVE_COUNT = 9
+    ALL_WINNING_COORDINATES = (
+        # Vertical wins
+        {(0, 0), (0, 1), (0, 2)},
+        {(1, 0), (1, 1), (1, 2)},
+        {(2, 0), (2, 1), (2, 2)},
+        # Horizontal wins
+        {(0, 0), (1, 0), (2, 0)},
+        {(0, 1), (1, 1), (2, 1)},
+        {(0, 2), (1, 2), (2, 2)},
+        # Diagonal wins
+        {(0, 0), (1, 1), (2, 2)},
+        {(2, 0), (1, 1), (0, 2)},
+    )
 
     def __init__(self, match: Match, moves: list[Move]):
         self.match = match
@@ -57,3 +71,14 @@ class GameEngine:
         )
         session.add(move)
         return move
+
+    def winner_id(self, moves: list[Move]) -> int | None:
+        coordinates = set(MoveList(moves).coordinates())
+
+        if any(
+            winning_coordinates.issubset(coordinates)
+            for winning_coordinates in self.ALL_WINNING_COORDINATES
+        ):
+            return moves[-1].user_id
+
+        return None
