@@ -7,7 +7,7 @@ LOGGING_CONFIG = {
     "formatters": {
         "console": {
             "class": "config.logging_config.formatters.EnvFormatter",
-            "format": "cli: %(asctime)s - %(environment)s - %(levelname)s - %(message)s",
+            "format": "web: %(asctime)s - %(environment)s - %(levelname)s - %(message)s",
             "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
@@ -22,7 +22,7 @@ LOGGING_CONFIG = {
             "level": "DEBUG",
             "class": "logging.handlers.RotatingFileHandler",
             "formatter": "console",
-            "filename": "logs/cli.log",
+            "filename": "logs/web.log",
             "mode": "a",
             "maxBytes": 5 * 1024 * 1024,  # 5 MB
             "backupCount": 3,

@@ -3,6 +3,7 @@ from __future__ import annotations
 from database import session
 from database.models import Match, Move
 from database.models.move import MoveList
+from logger import log
 from src.schemas import StatusResponse
 
 
@@ -83,12 +84,16 @@ class GameEngine:
             winning_coordinates.issubset(user_x_coordinates)
             for winning_coordinates in self.ALL_WINNING_COORDINATES
         ):
-            return user_x_moves[-1].user_id
+            user_id = user_x_moves[-1].user_id
+            log.info("User won the game. ID: %s", user_id)
+            return user_id
 
         if any(
             winning_coordinates.issubset(user_o_coordinates)
             for winning_coordinates in self.ALL_WINNING_COORDINATES
         ):
-            return user_o_moves[-1].user_id
+            user_id = user_o_moves[-1].user_id
+            log.info("User won the game. ID: %s", user_id)
+            return user_id
 
         return None
