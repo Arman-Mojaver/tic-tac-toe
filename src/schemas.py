@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, PositiveInt
 
 
+# Request schemas
 class CreateMatchData(BaseModel):
     user_x_id: PositiveInt
     user_o_id: PositiveInt
@@ -20,24 +21,25 @@ class CreateMoveData(BaseModel):
         return self.coordinate_x, self.coordinate_y
 
 
+# Response schemas
 class MatchResponse(BaseModel):
     match_id: PositiveInt
 
 
 class MoveResponse(BaseModel):
-    id: int
-    match_id: int
-    user_id: int
-    coordinate_x: int
-    coordinate_y: int
-    winner_id: int | None = None
+    id: PositiveInt
+    match_id: PositiveInt
+    user_id: PositiveInt
+    coordinate_x: Literal[0, 1, 2]
+    coordinate_y: Literal[0, 1, 2]
+    winner_id: PositiveInt | None = None
 
 
 class StatusResponse(BaseModel):
-    match_id: int
-    user_x_id: int
-    user_o_id: int
-    user_turn: int | None = None
-    user_x_coordinates: list[list[int]] = Field(default_factory=list)
-    user_o_coordinates: list[list[int]] = Field(default_factory=list)
-    winner_id: int | None = None
+    match_id: PositiveInt
+    user_x_id: PositiveInt
+    user_o_id: PositiveInt
+    user_turn: PositiveInt | None = None
+    user_x_coordinates: list[list[Literal[0, 1, 2]]] = Field(default_factory=list)
+    user_o_coordinates: list[list[Literal[0, 1, 2]]] = Field(default_factory=list)
+    winner_id: PositiveInt | None = None
