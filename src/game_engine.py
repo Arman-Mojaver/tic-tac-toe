@@ -1,14 +1,9 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 from database import session
-from database.models import Move
+from database.models import Match, Move
 from database.models.move import MoveList
 from src.schemas import GameStatus
-
-if TYPE_CHECKING:
-    from database.models import Match
 
 
 class GameEngine:
@@ -70,15 +65,30 @@ class GameEngine:
             move_order=current_move_order + 1,
         )
         session.add(move)
+
+        moves = sorted([*self.moves, move], key=lambda m: m.move_order)
+        user_x_moves = [move for move in moves if move.user_id == self.user_x_id]
+        user_o_moves = [move for move in moves if move.user_id == self.user_o_id]
+
+        winner_id = self.winner_id(user_x_moves=user_x_moves, user_o_moves=user_o_moves)
+        self.match.winner_id = winner_id
+        session.add(self.match)
         return move
 
-    def winner_id(self, moves: list[Move]) -> int | None:
-        coordinates = set(MoveList(moves).coordinates())
+    def winner_id(self, user_x_moves: list[Move], user_o_moves: list[Move]) -> int | None:
+        user_x_coordinates = set(MoveList(user_x_moves).coordinates())
+        user_o_coordinates = set(MoveList(user_o_moves).coordinates())
 
         if any(
-            winning_coordinates.issubset(coordinates)
+            winning_coordinates.issubset(user_x_coordinates)
             for winning_coordinates in self.ALL_WINNING_COORDINATES
         ):
-            return moves[-1].user_id
+            return user_x_moves[-1].user_id
+
+        if any(
+            winning_coordinates.issubset(user_o_coordinates)
+            for winning_coordinates in self.ALL_WINNING_COORDINATES
+        ):
+            return user_o_moves[-1].user_id
 
         return None

@@ -86,6 +86,9 @@ def test_no_win_logic(moves_data):
         for move_data in moves_data
     ]
 
+    user_x_moves = [move for move in moves if move.user_id == user_x.id]
+    user_o_moves = [move for move in moves if move.user_id == user_o.id]
+
     game_engine = GameEngine(match, moves=moves)
 
-    assert game_engine.winner_id(moves=moves) is None
+    assert not game_engine.winner_id(user_x_moves=user_x_moves, user_o_moves=user_o_moves)

@@ -93,9 +93,14 @@ def test_x_win_logic(moves_data):
         for move_data in moves_data
     ]
 
+    user_x_moves = [move for move in moves if move.user_id == user_x.id]
+    user_o_moves = [move for move in moves if move.user_id == user_o.id]
+
     game_engine = GameEngine(match, moves=moves)
 
-    assert game_engine.winner_id(moves=moves) == 1
+    assert (
+        game_engine.winner_id(user_x_moves=user_x_moves, user_o_moves=user_o_moves) == 1
+    )
 
 
 @pytest.mark.parametrize(
@@ -194,7 +199,11 @@ def test_o_win_logic(moves_data):
         )
         for move_data in moves_data
     ]
+    user_x_moves = [move for move in moves if move.user_id == user_x.id]
+    user_o_moves = [move for move in moves if move.user_id == user_o.id]
 
     game_engine = GameEngine(match, moves=moves)
 
-    assert game_engine.winner_id(moves=moves) == 2
+    assert (
+        game_engine.winner_id(user_x_moves=user_x_moves, user_o_moves=user_o_moves) == 2
+    )
