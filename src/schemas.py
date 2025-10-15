@@ -5,7 +5,7 @@ from typing import Literal
 from pydantic import BaseModel, Field, PositiveInt
 
 
-class MatchUsers(BaseModel):
+class CreateMatchData(BaseModel):
     user_x_id: PositiveInt
     user_o_id: PositiveInt
 

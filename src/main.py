@@ -13,7 +13,7 @@ from src.errors import (
     SameUserError,
     UserNotFoundError,
 )
-from src.schemas import MatchUsers, MoveData
+from src.schemas import CreateMatchData, MoveData
 from src.views.create_match_view import create_match_view
 from src.views.create_move_view import create_move_view
 from src.views.get_status_view import get_status_view
@@ -27,9 +27,9 @@ def health_check() -> JSONResponse:
 
 
 @app.post("/create")
-def create_match(match_users: MatchUsers) -> JSONResponse:
+def create_match(create_match_data: CreateMatchData) -> JSONResponse:
     try:
-        match = create_match_view(match_users=match_users)
+        match = create_match_view(create_match_data=create_match_data)
     except UserNotFoundError as e:
         return JSONResponse(
             content={"error": str(e)},

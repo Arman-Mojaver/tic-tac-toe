@@ -1,18 +1,18 @@
 from database import session
 from database.models import Match, User
 from src.errors import SameUserError, UserNotFoundError
-from src.schemas import MatchUsers
+from src.schemas import CreateMatchData
 
 
-def create_match_view(match_users: MatchUsers) -> Match:
-    user_x = session.query(User).filter_by(id=match_users.user_x_id).one_or_none()
+def create_match_view(create_match_data: CreateMatchData) -> Match:
+    user_x = session.query(User).filter_by(id=create_match_data.user_x_id).one_or_none()
     if not user_x:
-        err = f"User not found. ID {match_users.user_x_id}"
+        err = f"User not found. ID {create_match_data.user_x_id}"
         raise UserNotFoundError(err)
 
-    user_o = session.query(User).filter_by(id=match_users.user_o_id).one_or_none()
+    user_o = session.query(User).filter_by(id=create_match_data.user_o_id).one_or_none()
     if not user_o:
-        err = f"User not found. ID {match_users.user_o_id}"
+        err = f"User not found. ID {create_match_data.user_o_id}"
         raise UserNotFoundError(err)
 
     if user_x.id == user_o.id:
