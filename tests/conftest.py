@@ -21,11 +21,6 @@ from database.models import Match, Move, User
 from src.main import app
 
 
-@pytest.fixture(scope="session")
-def debug(request) -> bool:
-    return request.config.getoption("--d")
-
-
 @pytest.fixture(scope="session", autouse=True)
 def client():
     with TestClient(app) as client:
