@@ -32,6 +32,7 @@ def test_successful_initial_move(  # noqa: PLR0913
             "user_id": user_x.id,
             "coordinate_x": 1,
             "coordinate_y": 1,
+            "winner_id": None,
         }
     }
     assert not move.match.winner_id
@@ -69,6 +70,7 @@ def test_successful_move(  # noqa: PLR0913
             "user_id": user_o.id,
             "coordinate_x": 2,
             "coordinate_y": 2,
+            "winner_id": None,
         }
     }
     assert not move.match.winner_id
@@ -113,6 +115,7 @@ def test_successful_move_ends_the_game_without_winner(  # noqa: PLR0913
             "user_id": user_x.id,
             "coordinate_x": 2,
             "coordinate_y": 1,
+            "winner_id": None,
         }
     }
     assert not move.match.winner_id

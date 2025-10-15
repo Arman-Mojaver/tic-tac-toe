@@ -139,6 +139,7 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
                 "user_id": move_data.user_id,
                 "coordinate_x": move_data.coordinate_x,
                 "coordinate_y": move_data.coordinate_y,
+                "winner_id": match.winner_id,
             }
         },
         status_code=200,
