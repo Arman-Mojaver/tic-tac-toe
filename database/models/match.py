@@ -14,6 +14,7 @@ if TYPE_CHECKING:
 
 class Match(Base, CRUDMixin):
     __tablename__ = "match"
+    __repr_fields__ = ("user_x_id", "user_o_id", "winner_id")
     serialize_rules = ("-user_x", "-user_o", "-winner")
 
     id = Column(Integer, primary_key=True, autoincrement=True)

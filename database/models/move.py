@@ -13,6 +13,13 @@ if TYPE_CHECKING:
 
 class Move(Base, CRUDMixin):
     __tablename__ = "move"
+    __repr_fields__ = (
+        "match_id",
+        "user_id",
+        "coordinate_x",
+        "coordinate_y",
+        "move_order",
+    )
     serialize_rules = ("-match", "-user")
 
     id = Column(Integer, primary_key=True, autoincrement=True)
