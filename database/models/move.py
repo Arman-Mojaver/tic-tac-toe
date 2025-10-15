@@ -41,3 +41,8 @@ class Move(Base, CRUDMixin):
         foreign_keys=[user_id],
         passive_deletes=True,
     )
+
+
+class MoveList(list[Move]):
+    def coordinates(self) -> list[tuple[int, int]]:
+        return [(move.coordinate_x, move.coordinate_y) for move in self]

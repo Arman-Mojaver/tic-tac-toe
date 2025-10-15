@@ -53,3 +53,6 @@ class Match(Base, CRUDMixin):
         back_populates="match",
         passive_deletes=True,
     )
+
+    def user_ids(self) -> tuple[int, int]:
+        return self.user_x_id, self.user_o_id

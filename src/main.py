@@ -3,8 +3,9 @@ from fastapi.responses import JSONResponse
 
 from database import session
 from database.models import Match, User
+from database.models.move import MoveList
 from src.game_engine import GameEngine
-from src.schemas import MatchUsers
+from src.schemas import MatchUsers, MoveData
 
 app = FastAPI(title="tictactoe")
 
@@ -57,6 +58,67 @@ def get_status(match_id: int) -> JSONResponse:
     status = game_engine.status()
 
     return JSONResponse(
-            content={"data": status.model_dump()},
-            status_code=200,
+        content={"data": status.model_dump()},
+        status_code=200,
+    )
+
+
+@app.post("/move")
+def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
+    user = session.query(User).filter_by(id=move_data.user_id).one_or_none()
+    if not user:
+        return JSONResponse(
+            content={"error": f"User not found. ID: {move_data.user_id}"},
+            status_code=404,
+        )
+
+    match = session.query(Match).filter_by(id=move_data.match_id).one_or_none()
+    if not match:
+        return JSONResponse(
+            content={"error": f"Match not found. ID: {move_data.match_id}"},
+            status_code=404,
+        )
+
+    if move_data.user_id not in match.user_ids():
+        return JSONResponse(
+            content={
+                "error": f"User does not belong to match. User ID: {user.id}, Match ID: {match.id}"  # noqa: E501
+            },
+            status_code=404,
+        )
+
+    if match.winner_id:
+        return JSONResponse(
+            content={
+                "error": f"The game has already finished. The winner is: {match.winner_id}"  # noqa: E501
+            },
+            status_code=409,
+        )
+
+    if len(match.moves) == GameEngine.MAX_MOVE_COUNT and not match.winner_id:
+        return JSONResponse(
+            content={
+                "error": "The game has already finished without a winner. You can not make a move"  # noqa: E501
+            },
+            status_code=409,
+        )
+
+    if move_data.coordinates() in MoveList(match.moves).coordinates():
+        return JSONResponse(
+            content={
+                "error": f"Square already occupied. coordinate_x: {move_data.coordinate_x}, coordinate_y: {move_data.coordinate_y}"  # noqa: E501
+            },
+            status_code=409,
+        )
+
+
+
+    game_engine = GameEngine(match=match, moves=match.moves)
+
+    if game_engine.user_turn() != move_data.user_id:
+        return JSONResponse(
+            content={
+                "error": f"Invalid turn. It is not the turn of user_id: {move_data.user_id}"  # noqa: E501
+            },
+            status_code=409,
         )
