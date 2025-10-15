@@ -95,7 +95,7 @@ def test_successful_move_ends_the_game_without_winner(  # noqa: PLR0913
     create_move(match=match, user=match.user_x, x=2, y=0, order=5)
     create_move(match=match, user=match.user_o, x=0, y=2, order=6)
     create_move(match=match, user=match.user_x, x=0, y=1, order=7)
-    create_move(match=match, user=match.user_o, x=2, y=2, order=8)
+    create_move(match=match, user=match.user_o, x=2, y=1, order=8)
 
     response = client.post(
         "/move",
@@ -103,7 +103,7 @@ def test_successful_move_ends_the_game_without_winner(  # noqa: PLR0913
             "match_id": match.id,
             "user_id": user_x.id,
             "coordinate_x": 2,
-            "coordinate_y": 1,
+            "coordinate_y": 2,
         },
     )
     assert response.status_code == 200
@@ -114,7 +114,7 @@ def test_successful_move_ends_the_game_without_winner(  # noqa: PLR0913
             "match_id": match.id,
             "user_id": user_x.id,
             "coordinate_x": 2,
-            "coordinate_y": 1,
+            "coordinate_y": 2,
             "winner_id": None,
         }
     }
