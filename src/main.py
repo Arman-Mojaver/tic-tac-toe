@@ -1,3 +1,5 @@
+from http import HTTPStatus
+
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 
@@ -10,7 +12,7 @@ from src.schemas import MatchUsers, MoveData
 app = FastAPI(title="tictactoe")
 
 
-@app.get("/health", status_code=200)
+@app.get("/health", status_code=HTTPStatus.OK)
 def health_check() -> JSONResponse:
     return JSONResponse(content={"status": "ok"})
 
@@ -21,20 +23,20 @@ def create_match(match_users: MatchUsers) -> JSONResponse:
     if not user_x:
         return JSONResponse(
             content={"error": f"User not found. ID {match_users.user_x_id}"},
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     user_o = session.query(User).filter_by(id=match_users.user_o_id).one_or_none()
     if not user_o:
         return JSONResponse(
             content={"error": f"User not found. ID {match_users.user_o_id}"},
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     if user_x.id == user_o.id:
         return JSONResponse(
             content={"error": f"User ids can not be the same. ID: {user_x.id}"},
-            status_code=422,
+            status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
     match = Match(user_x_id=user_x.id, user_o_id=user_o.id)
@@ -51,7 +53,7 @@ def get_status(match_id: int) -> JSONResponse:
     if not match:
         return JSONResponse(
             content={"error": f"Match ID not found: {match_id}"},
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     game_engine = GameEngine(match=match, moves=match.moves)
@@ -59,7 +61,7 @@ def get_status(match_id: int) -> JSONResponse:
 
     return JSONResponse(
         content={"data": status.model_dump()},
-        status_code=200,
+        status_code=HTTPStatus.OK,
     )
 
 
@@ -69,14 +71,14 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
     if not user:
         return JSONResponse(
             content={"error": f"User not found. ID: {move_data.user_id}"},
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     match = session.query(Match).filter_by(id=move_data.match_id).one_or_none()
     if not match:
         return JSONResponse(
             content={"error": f"Match not found. ID: {move_data.match_id}"},
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     if move_data.user_id not in match.user_ids():
@@ -84,7 +86,7 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
             content={
                 "error": f"User does not belong to match. User ID: {user.id}, Match ID: {match.id}"  # noqa: E501
             },
-            status_code=404,
+            status_code=HTTPStatus.NOT_FOUND,
         )
 
     if match.winner_id:
@@ -92,7 +94,7 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
             content={
                 "error": f"The game has already finished. The winner is: {match.winner_id}"  # noqa: E501
             },
-            status_code=409,
+            status_code=HTTPStatus.CONFLICT,
         )
 
     if len(match.moves) == GameEngine.MAX_MOVE_COUNT and not match.winner_id:
@@ -100,7 +102,7 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
             content={
                 "error": "The game has already finished without a winner. You can not make a move"  # noqa: E501
             },
-            status_code=409,
+            status_code=HTTPStatus.CONFLICT,
         )
 
     if move_data.coordinates() in MoveList(match.moves).coordinates():
@@ -108,7 +110,7 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
             content={
                 "error": f"Square already occupied. coordinate_x: {move_data.coordinate_x}, coordinate_y: {move_data.coordinate_y}"  # noqa: E501
             },
-            status_code=409,
+            status_code=HTTPStatus.CONFLICT,
         )
 
 
@@ -120,7 +122,7 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
             content={
                 "error": f"Invalid turn. It is not the turn of user_id: {move_data.user_id}"  # noqa: E501
             },
-            status_code=409,
+            status_code=HTTPStatus.CONFLICT,
         )
 
     move = game_engine.create_move(
@@ -142,5 +144,5 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
                 "winner_id": match.winner_id,
             }
         },
-        status_code=200,
+        status_code=HTTPStatus.OK,
     )
