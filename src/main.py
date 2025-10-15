@@ -13,7 +13,7 @@ from src.errors import (
     SameUserError,
     UserNotFoundError,
 )
-from src.schemas import CreateMatchData, MoveData
+from src.schemas import CreateMatchData, CreateMoveData
 from src.views.create_match_view import create_match_view
 from src.views.create_move_view import create_move_view
 from src.views.get_status_view import get_status_view
@@ -61,9 +61,9 @@ def get_status(match_id: int) -> JSONResponse:
 
 
 @app.post("/move")
-def create_move(move_data: MoveData) -> JSONResponse:
+def create_move(create_move_data: CreateMoveData) -> JSONResponse:
     try:
-        move = create_move_view(move_data=move_data)
+        move = create_move_view(create_move_data=create_move_data)
     except (UserNotFoundError, MatchNotFoundError, MismatchError) as e:
         return JSONResponse(
             content={"error": str(e)},
@@ -82,9 +82,9 @@ def create_move(move_data: MoveData) -> JSONResponse:
             "data": {
                 "id": move.id,
                 "match_id": move.match.id,
-                "user_id": move_data.user_id,
-                "coordinate_x": move_data.coordinate_x,
-                "coordinate_y": move_data.coordinate_y,
+                "user_id": create_move_data.user_id,
+                "coordinate_x": create_move_data.coordinate_x,
+                "coordinate_y": create_move_data.coordinate_y,
                 "winner_id": move.match.winner_id,
             }
         },

@@ -10,7 +10,7 @@ class CreateMatchData(BaseModel):
     user_o_id: PositiveInt
 
 
-class MoveData(BaseModel):
+class CreateMoveData(BaseModel):
     match_id: PositiveInt
     user_id: PositiveInt
     coordinate_x: Literal[0, 1, 2]
