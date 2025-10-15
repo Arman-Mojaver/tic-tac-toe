@@ -25,7 +25,7 @@ class GameEngine:
             user_turn=self._user_turn(),
             user_x_coordinates=self._user_coordinates(user_id=self.user_x_id),
             user_o_coordinates=self._user_coordinates(user_id=self.user_o_id),
-            winner_id=None,
+            winner_id=self.match.winner_id,
         )
 
     def _user_coordinates(self, user_id: int) -> list[list[int, int]]:
@@ -36,7 +36,7 @@ class GameEngine:
         ]
 
     def _user_turn(self) -> int | None:
-        if len(self.moves) == self.MAX_MOVE_COUNT:
+        if len(self.moves) == self.MAX_MOVE_COUNT or self.match.winner_id:
             return None
 
         if not self.moves or self.moves[-1].user_id != self.user_x_id:
