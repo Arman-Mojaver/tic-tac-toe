@@ -2,10 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from database import session
+from database.models import Move
 from src.schemas import GameStatus
 
 if TYPE_CHECKING:
-    from database.models import Match, Move
+    from database.models import Match
 
 
 class GameEngine:
@@ -43,3 +45,15 @@ class GameEngine:
             return self.user_x_id
 
         return self.user_o_id
+
+    def create_move(self, user_id: int, coordinate_x: int, coordinate_y: int) -> Move:
+        current_move_order = self.moves[-1].move_order if self.moves else 1
+        move = Move(
+            match_id=self.match.id,
+            user_id=user_id,
+            coordinate_x=coordinate_x,
+            coordinate_y=coordinate_y,
+            move_order=current_move_order + 1,
+        )
+        session.add(move)
+        return move

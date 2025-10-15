@@ -122,3 +122,24 @@ def create_move(move_data: MoveData) -> JSONResponse:  # noqa: PLR0911
             },
             status_code=409,
         )
+
+    move = game_engine.create_move(
+        user_id=move_data.user_id,
+        coordinate_x=move_data.coordinate_x,
+        coordinate_y=move_data.coordinate_y,
+    )
+
+    session.commit()
+
+    return JSONResponse(
+        content={
+            "data": {
+                "id": move.id,
+                "match_id": match.id,
+                "user_id": move_data.user_id,
+                "coordinate_x": move_data.coordinate_x,
+                "coordinate_y": move_data.coordinate_y,
+            }
+        },
+        status_code=200,
+    )
