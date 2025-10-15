@@ -41,4 +41,4 @@ def test_successful(create_user, client, session):
     )
     assert response.status_code == 200
     match = session.query(Match).one_or_none()
-    assert response.json() == {"match_id": match.id}
+    assert response.json() == {"data": {"match_id": match.id}}

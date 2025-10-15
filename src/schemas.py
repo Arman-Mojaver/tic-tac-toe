@@ -20,6 +20,10 @@ class CreateMoveData(BaseModel):
         return self.coordinate_x, self.coordinate_y
 
 
+class MatchResponse(BaseModel):
+    match_id: PositiveInt
+
+
 class MoveResponse(BaseModel):
     id: int
     match_id: int

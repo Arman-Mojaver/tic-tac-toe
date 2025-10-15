@@ -1,10 +1,10 @@
 from database import session
 from database.models import Match, User
 from src.errors import SameUserError, UserNotFoundError
-from src.schemas import CreateMatchData
+from src.schemas import CreateMatchData, MatchResponse
 
 
-def create_match_view(create_match_data: CreateMatchData) -> Match:
+def create_match_view(create_match_data: CreateMatchData) -> MatchResponse:
     user_x = session.query(User).filter_by(id=create_match_data.user_x_id).one_or_none()
     if not user_x:
         err = f"User not found. ID {create_match_data.user_x_id}"
@@ -25,4 +25,4 @@ def create_match_view(create_match_data: CreateMatchData) -> Match:
     session.commit()
     session.refresh(match)
 
-    return match
+    return MatchResponse(match_id=match.id)

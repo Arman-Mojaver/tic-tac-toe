@@ -28,7 +28,7 @@ def health_check() -> JSONResponse:
 @app.post("/create")
 def create_match(create_match_data: CreateMatchData) -> JSONResponse:
     try:
-        match = create_match_view(create_match_data=create_match_data)
+        match_response = create_match_view(create_match_data=create_match_data)
     except UserNotFoundError as e:
         return JSONResponse(
             content={"error": str(e)},
@@ -40,7 +40,7 @@ def create_match(create_match_data: CreateMatchData) -> JSONResponse:
             status_code=HTTPStatus.UNPROCESSABLE_ENTITY,
         )
 
-    return JSONResponse(content={"match_id": match.id})
+    return JSONResponse(content={"data": match_response.model_dump()})
 
 
 @app.get("/status")
