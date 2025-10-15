@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 
-.PHONY: help up in down build bash freeze pytest cov env-file venv pre-commit setup \
-        alembic-upgrade alembic-downgrade
+.PHONY: help up in down build pytest cov alembic-upgrade alembic-downgrade \
+		bash freeze seed env-file venv pre-commit setup docs
 
 .DEFAULT_GOAL := help
 
