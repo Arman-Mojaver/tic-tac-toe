@@ -1,6 +1,10 @@
+class UserNotFoundError(Exception):
+    pass
+
+
 class SameUserError(Exception):
     pass
 
 
-class UserNotFoundError(Exception):
+class MatchNotFoundError(Exception):
     pass
