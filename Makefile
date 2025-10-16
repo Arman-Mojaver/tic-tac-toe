@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-.PHONY: help up in down build pytest cov alembic-upgrade alembic-downgrade \
+.PHONY: help up in down build log web-log pytest cov alembic-upgrade alembic-downgrade \
 		bash freeze seed env-file venv pre-commit setup docs
 
 .DEFAULT_GOAL := help
@@ -30,6 +30,11 @@ down:  ## Remove containers
 build:  ## Build image
 	docker compose -f docker-compose.yaml build
 
+log:  ## View logs
+	docker compose logs -f
+
+web-log:  ## View web logs
+	docker compose logs webapp -f
 
 
 # Tests
