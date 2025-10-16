@@ -123,6 +123,11 @@ The configuration rules for Ruff are defined in `pyproject.toml`.
 Pre-commit hooks automatically run checks before each commit to ensure code style, formatting, and quality are enforced.
 The hooks are configured in the `.pre-commit-config.yaml` file.
 
+## Database design
+The following image is an ERD (Entity Relationship Diagram) of the current state of the project.
+![ERD tic-tac-toe.png](ERD%20tic-tac-toe.png)
+
+
 ## Database Seeding
 To populate the database with initial test data (such as default users), you can execute the following CLI command:
 ```
