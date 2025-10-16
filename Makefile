@@ -108,6 +108,12 @@ setup: ## Setup environment, build images and containers, start webapp
 	@echo "🚀 Building Docker images and starting containers..."
 	@$(MAKE) build
 	@$(MAKE) up
+	@echo "Waiting for PostgreSQL to be ready..."
+		@until docker compose -f docker-compose.yaml exec -T db-development sh -c 'pg_isready -U postgres -d db-development | grep "accepting connections" > /dev/null'; do \
+			echo "Still waiting..."; \
+			sleep 1; \
+		done
+	sleep 5
 	@$(MAKE) alembic-upgrade
 	@$(MAKE) seed
 	@echo "⚡ Containers started, opening docs..."
