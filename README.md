@@ -132,3 +132,16 @@ or
 ```
 make seed
 ```
+
+## Logging
+The logs are stored in `logs/web.log` file.
+
+In addition, the live logs can be viewed by executing the following commands:
+* To view the logs of all services:
+```
+make log
+```
+* To view exclusively the web application logs:
+```
+make web-log
+```
